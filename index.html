@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SELF + FISH | A Gentle Return to You</title>
+<meta name="description" content="SELF + FISH by Santesha Johnson. Woman to Woman. Human to Human. A guided wellness journal to heal, reflect, and grow.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Approved palette: olive green, gold accents, premium white / ivory */
+    --olive-900: #2b3415;
+    --olive-700: #3f4c1f;
+    --olive-500: #5d6b30;
+    --gold-600: #a9823a;
+    --gold-500: #c19b4f;
+    --gold-300: #e2cb93;
+    --ivory: #fbf8f1;
+    --ivory-2: #f4efe3;
+    --white: #ffffff;
+    --ink: #2a2a24;
+    --ink-soft: #5b5a50;
+
+    --serif: "Cormorant Garamond", Georgia, "Times New Roman", serif;
+    --sans: "Jost", "Helvetica Neue", Arial, sans-serif;
+    --wrap: 1180px;
+    --gutter: clamp(16px, 4vw, 40px);
+  }
+  *, *::before, *::after { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  body {
+    margin: 0;
+    background: var(--ivory);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-weight: 300;
+    font-size: 17px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+  img, video { display: block; max-width: 100%; }
+  img { height: auto; } /* keep natural aspect ratio when width/height attributes are set */
+  a { color: inherit; }
+  .wrap { width: 100%; max-width: var(--wrap); margin: 0 auto; padding: 0 var(--gutter); }
+  .skip { position: absolute; left: -9999px; }
+  .skip:focus { left: 16px; top: 16px; z-index: 100; background: var(--white); padding: 8px 14px; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: .6em;
+    font-family: var(--sans); font-weight: 500; font-size: 13px;
+    letter-spacing: .18em; text-transform: uppercase; text-decoration: none;
+    padding: 16px 30px; border-radius: 999px; border: 1px solid transparent;
+    transition: background .25s, color .25s, border-color .25s, transform .25s;
+    min-height: 48px;
+  }
+  .btn:hover { transform: translateY(-1px); }
+  .btn:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 3px; }
+  .btn-olive { background: var(--olive-700); color: var(--ivory); }
+  .btn-olive:hover { background: var(--olive-900); }
+  .btn-gold { background: linear-gradient(180deg, var(--gold-300), var(--gold-500)); color: var(--olive-900); }
+  .btn-gold:hover { background: var(--gold-300); }
+  .btn-ghost-light { border-color: rgba(255,255,255,.75); color: var(--white); }
+  .btn-ghost-light:hover { background: rgba(255,255,255,.14); }
+  .btn-ghost { border-color: var(--olive-700); color: var(--olive-700); }
+  .btn-ghost:hover { background: var(--olive-700); color: var(--ivory); }
+
+  /* ---------- Header ---------- */
+  .site-header {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(251, 248, 241, .94);
+    backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid rgba(169, 130, 58, .22);
+  }
+  .site-header .wrap { display: flex; align-items: center; justify-content: space-between; gap: 20px; height: 84px; }
+  .brand img { height: 58px; width: auto; }
+  .nav { display: flex; align-items: center; gap: 34px; }
+  .nav a.link {
+    font-size: 13px; letter-spacing: .16em; text-transform: uppercase; text-decoration: none;
+    color: var(--olive-900); font-weight: 400; padding: 6px 0; position: relative;
+  }
+  .nav a.link::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: 0; height: 1px; background: var(--gold-500);
+    transition: right .25s;
+  }
+  .nav a.link:hover::after, .nav a.link:focus-visible::after { right: 0; }
+  .nav .btn { padding: 12px 22px; font-size: 12px; min-height: 44px; }
+  .menu-toggle {
+    display: none; background: none; border: 0; width: 44px; height: 44px; padding: 10px; cursor: pointer; color: var(--olive-900);
+  }
+  .menu-toggle span { display: block; height: 1.5px; background: currentColor; margin: 6px 0; transition: transform .25s, opacity .25s; }
+  .menu-open .menu-toggle span:nth-child(1) { transform: translateY(7.5px) rotate(45deg); }
+  .menu-open .menu-toggle span:nth-child(2) { opacity: 0; }
+  .menu-open .menu-toggle span:nth-child(3) { transform: translateY(-7.5px) rotate(-45deg); }
+
+  /* ---------- Hero (moving beach video) ---------- */
+  .hero {
+    position: relative; min-height: calc(100svh - 84px); min-height: calc(100vh - 84px);
+    display: grid; place-items: center; overflow: hidden; color: var(--white); text-align: center;
+    background: var(--olive-900) url("assets/hero-poster.jpg") center / cover no-repeat;
+  }
+  @supports (min-height: 100svh) { .hero { min-height: calc(100svh - 84px); } }
+  .hero video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+  .hero::after {
+    /* Soft scrim so white type stays legible over bright sand and sky */
+    content: ""; position: absolute; inset: 0;
+    background:
+      linear-gradient(180deg, rgba(20, 26, 10, .30) 0%, rgba(20, 26, 10, .16) 40%, rgba(20, 26, 10, .40) 100%),
+      radial-gradient(ellipse at center, rgba(20, 26, 10, .42) 0%, rgba(20, 26, 10, 0) 68%);
+  }
+  .hero-inner { position: relative; z-index: 2; padding: 96px var(--gutter); max-width: 900px; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 16px;
+    font-size: 12px; letter-spacing: .32em; text-transform: uppercase; font-weight: 400;
+  }
+  .eyebrow::before, .eyebrow::after { content: ""; width: 42px; height: 1px; background: currentColor; opacity: .7; }
+  .hero .eyebrow { color: #f3e3b8; text-shadow: 0 1px 12px rgba(0,0,0,.45); }
+  .hero h1 {
+    text-wrap: balance;
+    font-family: var(--serif); font-weight: 500; font-style: italic;
+    font-size: clamp(46px, 8vw, 104px); line-height: 1.02; margin: 22px 0 20px;
+    text-shadow: 0 2px 30px rgba(0,0,0,.25);
+  }
+  .hero .lede {
+    font-family: var(--serif); font-size: clamp(20px, 2.4vw, 27px); line-height: 1.45; margin: 0 auto 40px;
+    max-width: 30ch; text-shadow: 0 1px 18px rgba(0,0,0,.3);
+  }
+  .hero .actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+  .video-toggle {
+    position: absolute; z-index: 3; right: var(--gutter); bottom: 24px;
+    width: 44px; height: 44px; border-radius: 50%;
+    border: 1px solid rgba(255,255,255,.6); background: rgba(20,26,10,.25); color: var(--white);
+    display: grid; place-items: center; cursor: pointer;
+  }
+  .video-toggle:focus-visible { outline: 2px solid var(--gold-300); outline-offset: 3px; }
+  .video-toggle svg { width: 16px; height: 16px; }
+  .scroll-cue {
+    position: absolute; z-index: 3; left: 50%; bottom: 26px; transform: translateX(-50%);
+    width: 1px; height: 46px; background: linear-gradient(var(--white), transparent); opacity: .7;
+  }
+
+  /* ---------- Sections ---------- */
+  section { scroll-margin-top: 84px; }
+  .section { padding: clamp(80px, 11vw, 150px) 0; }
+  .kicker { color: var(--gold-600); }
+  h2 {
+    font-family: var(--serif); font-weight: 500; color: var(--olive-900);
+    font-size: clamp(38px, 5vw, 62px); line-height: 1.08; margin: 18px 0 26px;
+  }
+  h2 em { font-style: italic; color: var(--olive-500); }
+  .rule { width: 72px; height: 1px; background: var(--gold-500); border: 0; margin: 0 0 30px; }
+  .center { text-align: center; }
+  .center .rule { margin-left: auto; margin-right: auto; }
+
+  /* Founder: original photo alone in generous white space */
+  .founder { background: var(--white); }
+  .founder .grid {
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+    gap: clamp(48px, 8vw, 120px); align-items: center;
+  }
+  .founder figure { margin: 0; justify-self: center; width: 100%; max-width: 440px; }
+  .founder figure img {
+    width: 100%; height: auto; /* natural aspect ratio: no cropping, no alteration */
+    box-shadow: 0 30px 60px -30px rgba(43, 52, 21, .35);
+  }
+  .founder figcaption {
+    margin-top: 18px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--ink-soft); text-align: center;
+  }
+  .founder .name { font-family: var(--serif); font-style: italic; font-size: clamp(30px, 3.2vw, 40px); color: var(--olive-700); margin: 0 0 4px; }
+  .founder .role { font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--gold-600); margin: 0 0 28px; }
+  .tagline {
+    display: inline-block; font-family: var(--serif); font-style: italic; font-size: clamp(22px, 2.2vw, 27px);
+    color: var(--olive-900); padding: 6px 0 6px 20px; border-left: 2px solid var(--gold-500); margin: 0 0 28px;
+  }
+  .founder p.body { color: var(--ink-soft); margin: 0 0 18px; max-width: 54ch; }
+
+  /* Journal */
+  .journal { background: var(--ivory); }
+  .journal .grid {
+    display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr);
+    gap: clamp(48px, 7vw, 110px); align-items: center;
+  }
+  .journal .cover {
+    width: 100%; max-width: 460px; justify-self: center;
+    background: var(--white); padding: clamp(20px, 3vw, 32px);
+    box-shadow: 0 40px 80px -40px rgba(43, 52, 21, .35); border: 1px solid rgba(169,130,58,.18);
+  }
+  .journal p.body { color: var(--ink-soft); margin: 0 0 18px; max-width: 52ch; }
+  .pillars {
+    list-style: none; padding: 0; margin: 34px 0 34px;
+    display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid rgba(169,130,58,.3); border-bottom: 1px solid rgba(169,130,58,.3);
+  }
+  .pillars li { text-align: center; padding: 22px 8px; position: relative; }
+  .pillars li + li::before { content: ""; position: absolute; left: 0; top: 24%; bottom: 24%; width: 1px; background: rgba(169,130,58,.35); }
+  .pillars svg { display: block; width: 26px; height: 26px; color: var(--gold-600); margin: 0 auto 10px; }
+  .pillars span { display: block; font-size: 12px; letter-spacing: .26em; padding-left: .26em; /* balance trailing letter-spacing so labels center */ text-transform: uppercase; color: var(--olive-900); font-weight: 400; }
+  .details { list-style: none; padding: 0; margin: 0 0 36px; }
+  .details li { display: flex; gap: 14px; align-items: baseline; padding: 6px 0; color: var(--ink); }
+  .details li::before { content: ""; flex: none; width: 6px; height: 6px; transform: rotate(45deg) translateY(-2px); background: var(--gold-500); }
+  .price-row { display: flex; flex-wrap: wrap; align-items: center; gap: 22px 28px; }
+  .price { font-family: var(--serif); font-size: 38px; color: var(--olive-900); line-height: 1; }
+  .price small { display: block; font-family: var(--sans); font-size: 11px; letter-spacing: .22em; text-transform: uppercase; color: var(--ink-soft); margin-top: 8px; }
+
+  /* Benefits */
+  .benefits { background: var(--white); }
+  .benefit-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: clamp(28px, 4vw, 56px); margin-top: 64px; }
+  .benefit { text-align: center; padding: 0 8px; }
+  .benefit .num { font-family: var(--serif); font-style: italic; font-size: 44px; color: var(--gold-500); line-height: 1; }
+  .benefit h3 { font-family: var(--serif); font-weight: 500; font-size: 27px; color: var(--olive-900); margin: 14px 0 10px; }
+  .benefit p { color: var(--ink-soft); margin: 0 auto; max-width: 32ch; }
+
+  /* Coming soon */
+  .soon { background: var(--ivory); }
+  .soon-grid {
+    display: grid; grid-template-columns: repeat(2, minmax(0, 360px)); justify-content: center;
+    gap: clamp(28px, 5vw, 64px); margin-top: 64px;
+  }
+  .product { text-decoration: none; color: inherit; display: block; }
+  .product .tile {
+    position: relative; background: var(--white); aspect-ratio: 4 / 5; overflow: hidden;
+    border: 1px solid rgba(169,130,58,.18); box-shadow: 0 30px 60px -36px rgba(43, 52, 21, .3);
+  }
+  .product .tile img { width: 100%; height: 100%; object-fit: contain; padding: 6%; transition: transform .6s ease; }
+  .product:hover .tile img { transform: scale(1.03); }
+  .badge {
+    position: absolute; top: 16px; right: 16px;
+    background: var(--olive-700); color: var(--ivory);
+    font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; font-weight: 500;
+    padding: 7px 14px; border-radius: 999px;
+  }
+  .product h3 { font-family: var(--serif); font-weight: 500; font-size: 26px; color: var(--olive-900); margin: 22px 0 2px; }
+  .product .meta { font-size: 13px; letter-spacing: .16em; text-transform: uppercase; color: var(--gold-600); }
+
+  /* CTA band */
+  .cta-band { background: var(--olive-700); color: var(--ivory); text-align: center; position: relative; overflow: hidden; }
+  .cta-band::before {
+    content: ""; position: absolute; inset: 0;
+    background: radial-gradient(ellipse at 50% 0%, rgba(226, 203, 147, .18), transparent 60%);
+  }
+  .cta-band .wrap { position: relative; }
+  .cta-band .eyebrow { color: var(--gold-300); }
+  .cta-band h2 { color: var(--ivory); font-style: italic; }
+  .cta-band p { max-width: 46ch; margin: 0 auto 40px; color: rgba(251, 248, 241, .85); }
+  .cta-band .actions { display: flex; flex-wrap: wrap; gap: 14px; justify-content: center; }
+
+  /* Contact */
+  .contact { background: var(--ivory); }
+  .contact p { color: var(--ink-soft); max-width: 48ch; margin: 0 auto 36px; }
+
+  /* Footer */
+  .site-footer { background: var(--white); border-top: 1px solid rgba(169,130,58,.22); padding: 56px 0 40px; text-align: center; }
+  .site-footer img { height: 64px; width: auto; margin: 0 auto 18px; }
+  .site-footer .tag { font-family: var(--serif); font-style: italic; font-size: 21px; color: var(--olive-700); margin: 0 0 24px; }
+  .site-footer nav { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px 28px; margin-bottom: 26px; }
+  .site-footer nav a { font-size: 12px; letter-spacing: .18em; text-transform: uppercase; text-decoration: none; color: var(--olive-900); padding: 8px 0; }
+  .site-footer nav a:hover { color: var(--gold-600); }
+  .site-footer small { color: var(--ink-soft); font-size: 13px; }
+
+  /* ---------- Hover effects ---------- */
+  :root { --ease: cubic-bezier(.22, .61, .36, 1); }
+
+  /* Buttons: lift, soft glow, and a light sheen that sweeps across */
+  .btn { position: relative; overflow: hidden; isolation: isolate;
+    transition: background .35s var(--ease), color .35s var(--ease), border-color .35s var(--ease),
+                transform .35s var(--ease), box-shadow .35s var(--ease); }
+  .btn::before {
+    content: ""; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+    background: linear-gradient(110deg, transparent 30%, rgba(255,255,255,.45) 50%, transparent 70%);
+    transform: translateX(-120%); transition: transform .8s var(--ease);
+  }
+  .btn-ghost-light:hover { background: var(--white); color: var(--olive-900); border-color: var(--white); }
+  .btn-ghost:hover { box-shadow: 0 14px 30px -14px rgba(43, 52, 21, .55); }
+
+  /* Header logo */
+  .brand img { transition: transform .45s var(--ease), filter .45s var(--ease); }
+
+  /* Founder photo: offset gold frame slides in */
+  .founder figure .frame { position: relative; }
+  .founder figure .frame::before {
+    content: ""; position: absolute; inset: 0; border: 1px solid var(--gold-500);
+    transform: translate(0, 0); opacity: 0; pointer-events: none;
+    transition: transform .6s var(--ease), opacity .6s var(--ease);
+  }
+  .founder figure img { position: relative; transition: transform .6s var(--ease), box-shadow .6s var(--ease); }
+
+  /* Journal cover */
+  .journal .cover { transition: transform .6s var(--ease), box-shadow .6s var(--ease), border-color .6s var(--ease); }
+
+  /* Pillars */
+  .pillars li { transition: background .4s var(--ease); }
+  .pillars .ico {
+    width: 52px; height: 52px; margin: 0 auto 12px; border-radius: 50%;
+    display: grid; place-items: center; background: rgba(193, 155, 79, .12);
+    transition: background .4s var(--ease), transform .4s var(--ease), box-shadow .4s var(--ease);
+  }
+  .pillars .ico svg { margin: 0; transition: color .4s var(--ease); }
+
+  /* Benefits */
+  .benefit { padding: 36px 24px 40px; border-radius: 4px;
+    transition: background .5s var(--ease), transform .5s var(--ease), box-shadow .5s var(--ease); }
+  .benefit .num { transition: color .5s var(--ease), transform .5s var(--ease); display: inline-block; }
+  .benefit h3 { position: relative; display: inline-block; }
+  .benefit h3::after {
+    content: ""; position: absolute; left: 50%; right: 50%; bottom: -6px; height: 1px; background: var(--gold-500);
+    transition: left .45s var(--ease), right .45s var(--ease);
+  }
+
+  /* Product cards */
+  .product .tile { transition: transform .5s var(--ease), box-shadow .5s var(--ease), border-color .5s var(--ease); }
+  .product .tile img { transition: transform .8s var(--ease); }
+  .product h3 { transition: color .35s var(--ease); }
+  .product .more {
+    display: flex; justify-content: center; align-items: center; gap: 8px; margin-top: 10px;
+    font-size: 12px; letter-spacing: .18em; text-transform: uppercase; color: var(--olive-700);
+    opacity: .7; transition: opacity .35s var(--ease), gap .35s var(--ease);
+  }
+  .product .more::after { content: "\2192"; }
+
+  /* Footer links and video control */
+  .site-footer nav a { position: relative; transition: color .3s var(--ease); }
+  .site-footer nav a::after {
+    content: ""; position: absolute; left: 0; right: 100%; bottom: 4px; height: 1px; background: var(--gold-500);
+    transition: right .3s var(--ease);
+  }
+  .video-toggle { transition: background .3s var(--ease), color .3s var(--ease), transform .3s var(--ease); }
+
+  @media (hover: hover) and (pointer: fine) {
+    .btn:hover { transform: translateY(-2px); }
+    .btn:hover::before { transform: translateX(120%); }
+    .btn-olive:hover { box-shadow: 0 14px 30px -12px rgba(43, 52, 21, .6); }
+    .btn-gold:hover { box-shadow: 0 14px 34px -10px rgba(193, 155, 79, .75); }
+    .btn-ghost-light:hover { box-shadow: 0 14px 30px -12px rgba(0, 0, 0, .35); }
+
+    .nav a.link:hover { color: var(--gold-600); }
+    .brand:hover img { transform: scale(1.04); filter: drop-shadow(0 4px 10px rgba(193, 155, 79, .35)); }
+
+    .founder figure:hover .frame::before { transform: translate(16px, 16px); opacity: 1; }
+    .founder figure:hover img { transform: translate(-4px, -4px); box-shadow: 0 40px 70px -30px rgba(43, 52, 21, .45); }
+
+    .journal .cover:hover {
+      transform: translateY(-8px) rotate(-.6deg);
+      box-shadow: 0 50px 90px -40px rgba(43, 52, 21, .5); border-color: rgba(169, 130, 58, .45);
+    }
+
+    .pillars li:hover { background: rgba(193, 155, 79, .06); }
+    .pillars li:hover .ico { background: var(--olive-700); transform: translateY(-4px); box-shadow: 0 12px 22px -12px rgba(43, 52, 21, .6); }
+    .pillars li:hover .ico svg { color: var(--gold-300); }
+
+    .benefit:hover { background: var(--ivory); transform: translateY(-6px); box-shadow: 0 30px 60px -40px rgba(43, 52, 21, .35); }
+    .benefit:hover .num { color: var(--olive-500); transform: scale(1.12); }
+    .benefit:hover h3::after { left: 0; right: 0; }
+
+    .product:hover .tile { transform: translateY(-8px); border-color: rgba(169, 130, 58, .45); box-shadow: 0 46px 80px -40px rgba(43, 52, 21, .45); }
+    .product:hover .tile img { transform: scale(1.06); }
+    .product:hover h3 { color: var(--gold-600); }
+    .product:hover .more { opacity: 1; gap: 14px; }
+
+    .site-footer nav a:hover::after { right: 0; }
+    .video-toggle:hover { background: var(--white); color: var(--olive-900); transform: scale(1.06); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .btn::before { display: none; }
+    *, *::before, *::after { transition-duration: .01ms !important; }
+  }
+
+  /* Reveal on scroll */
+  .reveal { opacity: 0; transform: translateY(24px); transition: opacity .9s ease, transform .9s ease; }
+  .reveal.in { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) { .reveal { opacity: 1; transform: none; transition: none; } }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 960px) {
+    .site-header .wrap { height: 72px; }
+    .brand img { height: 48px; }
+    section { scroll-margin-top: 72px; }
+    .hero { min-height: calc(100vh - 72px); }
+    @supports (min-height: 100svh) { .hero { min-height: calc(100svh - 72px); } }
+    .menu-toggle { display: block; }
+    .nav {
+      position: absolute; top: 72px; left: 0; right: 0;
+      flex-direction: column; align-items: stretch; gap: 0;
+      background: var(--ivory); border-bottom: 1px solid rgba(169,130,58,.25);
+      padding: 8px var(--gutter) 24px;
+      display: none;
+    }
+    .menu-open .nav { display: flex; }
+    .nav a.link { padding: 16px 0; border-bottom: 1px solid rgba(169,130,58,.15); }
+    .nav a.link::after { display: none; }
+    .nav .btn { margin-top: 18px; }
+    .founder .grid, .journal .grid { grid-template-columns: 1fr; }
+    .founder figure { max-width: 380px; }
+    .journal .cover { max-width: 460px; margin: 0 auto; width: 100%; }
+    .journal .text { order: 2; }
+    .benefit-grid { grid-template-columns: 1fr; gap: 48px; margin-top: 48px; }
+    .soon-grid { grid-template-columns: minmax(0, 360px); gap: 48px; margin-top: 48px; }
+  }
+  @media (max-width: 520px) {
+    body { font-size: 16px; }
+    .hero .actions .btn, .cta-band .actions .btn { width: 100%; }
+    .pillars { grid-template-columns: repeat(2, 1fr); }
+    .pillars li:nth-child(3)::before { display: none; }
+    .pillars li:nth-child(-n+2) { border-bottom: 1px solid rgba(169,130,58,.2); }
+    .eyebrow { letter-spacing: .24em; font-size: 11px; gap: 10px; }
+    .eyebrow::before, .eyebrow::after { width: 22px; }
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-header" id="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="SELF + FISH home">
+      <img src="assets/logo-web.png" alt="SELF + FISH" width="900" height="307">
+    </a>
+    <button class="menu-toggle" aria-label="Open menu" aria-expanded="false" aria-controls="site-nav">
+      <span></span><span></span><span></span>
+    </button>
+    <nav class="nav" id="site-nav" aria-label="Main">
+      <a class="link" href="#founder">Meet Santesha</a>
+      <a class="link" href="#journal">The Journal</a>
+      <a class="link" href="#contact">Contact</a>
+      <a class="btn btn-olive" data-link="purchase" href="https://selfandfish.com/products/self-fish-journal">Order the Journal</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+  <!-- HERO: moving beach video -->
+  <section class="hero" aria-label="Welcome">
+    <video id="heroVideo" autoplay muted loop playsinline preload="metadata" poster="assets/hero-poster.jpg" aria-hidden="true">
+      <!-- Primary: approved bright daytime beach clip (white sand, clear blue water). Drop the file at assets/hero-beach.mp4 -->
+      <source src="assets/hero-beach.webm" type="video/webm">
+      <source src="assets/hero-beach.mp4" type="video/mp4">
+      <!-- Fallback: current selfandfish.com hero clip, used only until the approved clip is in place -->
+      <source src="https://selfandfish.com/cdn/shop/videos/c/vp/5d2771564d484dd2a4e9b081135a18d2/5d2771564d484dd2a4e9b081135a18d2.HD-720p-4.5Mbps-94616906.mp4" type="video/mp4">
+    </video>
+    <div class="hero-inner">
+      <span class="eyebrow">Woman to Woman. Human to Human.</span>
+      <h1>A Gentle Return to You</h1>
+      <p class="lede">Created with intention. Made for the journal back to you.</p>
+      <div class="actions">
+        <a class="btn btn-gold" data-link="purchase" href="https://selfandfish.com/products/self-fish-journal">Order Your Journal</a>
+        <a class="btn btn-ghost-light" href="#founder">Meet the Founder</a>
+      </div>
+    </div>
+    <button class="video-toggle" type="button" aria-label="Pause background video">
+      <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect class="i-pause" x="3" y="2" width="3.5" height="12" rx="1"/><rect class="i-pause" x="9.5" y="2" width="3.5" height="12" rx="1"/><path class="i-play" d="M4 2.5v11l10-5.5z" style="display:none"/></svg>
+    </button>
+    <span class="scroll-cue" aria-hidden="true"></span>
+  </section>
+
+  <!-- FOUNDER -->
+  <section class="founder section" id="founder" aria-labelledby="founder-title">
+    <div class="wrap grid">
+      <figure class="reveal">
+        <!-- Original founder photo, used as supplied (no retouching, regeneration or cropping of the face) -->
+        <div class="frame"><img src="assets/founder.png" alt="Santesha Johnson, founder of SELF + FISH" width="647" height="1150" loading="lazy"></div>
+        <figcaption>Santesha Johnson</figcaption>
+      </figure>
+      <div class="reveal">
+        <span class="eyebrow kicker">Meet the Founder</span>
+        <h2 id="founder-title">Santesha <em>Johnson</em></h2>
+        <p class="role">Founder, SELF + FISH</p>
+        <p class="tagline">Woman to Woman. Human to Human.</p>
+        <p class="body">I created SELF + FISH from a personal journey of healing, self-discovery, and growth. This journal is a collection of the lessons I've learned, the challenges I've faced, and the tools that helped me keep going.</p>
+        <p class="body">My heart is to encourage you, remind you that you're not alone, and give you a safe space to heal, reflect, and grow into the next version of yourself.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- JOURNAL -->
+  <section class="journal section" id="journal" aria-labelledby="journal-title">
+    <div class="wrap grid">
+      <div class="text reveal">
+        <span class="eyebrow kicker">The Wellness Journal</span>
+        <h2 id="journal-title">The SELF + FISH <em>Journal</em></h2>
+        <hr class="rule">
+        <p class="body">More than a journal, it's a guided space to heal, reflect, grow, and make room for you. A place to pause, process, and reconnect with yourself through real-life experiences, thoughtful prompts, and honest reflection.</p>
+        <ul class="pillars" aria-label="Journal themes">
+          <li>
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M5 19c0-8 5-13 14-14-1 9-6 14-14 14z"/><path d="M5 19 13 11"/></svg></div>
+            <span>Heal</span>
+          </li>
+          <li>
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg></div>
+            <span>Reflect</span>
+          </li>
+          <li>
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M12 21V11"/><path d="M12 13c0-4-3-6-7-6 0 4 3 6 7 6z"/><path d="M12 11c0-4 3-6 7-6 0 4-3 6-7 6z"/></svg></div>
+            <span>Grow</span>
+          </li>
+          <li>
+            <div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" aria-hidden="true"><path d="M12 19c-3-2-4-5-4-8 2 1 3.3 2.4 4 4 .7-1.6 2-3 4-4 0 3-1 6-4 8z"/><path d="M12 15c-.8-3-.8-6 0-9 .8 3 .8 6 0 9z"/><path d="M8 11c-2.2-.5-3.7.2-4.5 1.5 1.2 2.5 4 4.5 8.5 6.5"/><path d="M16 11c2.2-.5 3.7.2 4.5 1.5-1.2 2.5-4 4.5-8.5 6.5"/></svg></div>
+            <span>You</span>
+          </li>
+        </ul>
+        <ul class="details">
+          <li>Guided prompts drawn from real-life experience</li>
+          <li>Space to write, process, and return to yourself</li>
+          <li>Written by Santesha Johnson, woman to woman</li>
+        </ul>
+        <div class="price-row">
+          <div class="price">$30<small>SELF + FISH Journal</small></div>
+          <a class="btn btn-olive" data-link="purchase" href="https://selfandfish.com/products/self-fish-journal">Order the Journal</a>
+        </div>
+      </div>
+      <div class="cover reveal">
+        <img src="assets/journal-2.png" alt="SELF + FISH Journal cover: A Gentle Return to Me, by Santesha Johnson" width="1148" height="1371" loading="lazy">
+      </div>
+    </div>
+  </section>
+
+  <!-- BENEFITS -->
+  <section class="benefits section" aria-labelledby="benefits-title">
+    <div class="wrap center">
+      <span class="eyebrow kicker">Why the Journal</span>
+      <h2 id="benefits-title">Make Room <em>for You</em></h2>
+      <hr class="rule">
+      <div class="benefit-grid">
+        <div class="benefit reveal">
+          <div class="num">i.</div>
+          <h3>Pause</h3>
+          <p>Give yourself permission to slow down. You deserve a moment that belongs only to you.</p>
+        </div>
+        <div class="benefit reveal">
+          <div class="num">ii.</div>
+          <h3>Process</h3>
+          <p>Thoughtful prompts help you work through what you've carried with honesty and grace.</p>
+        </div>
+        <div class="benefit reveal">
+          <div class="num">iii.</div>
+          <h3>Reconnect</h3>
+          <p>Grow into the next version of yourself, one gentle page at a time. You're not alone.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- COMING SOON -->
+  <section class="soon section" id="coming-soon" aria-labelledby="soon-title">
+    <div class="wrap center">
+      <span class="eyebrow kicker">Coming Soon</span>
+      <h2 id="soon-title">More from <em>SELF + FISH</em></h2>
+      <hr class="rule">
+      <div class="soon-grid">
+        <a class="product reveal" href="https://selfandfish.com/products/self-fish-signature-keychain">
+          <div class="tile">
+            <img src="assets/keychain.jpg" alt="SELF + FISH Signature Keychain, gold ring with the SELF + FISH emblem" width="1000" height="1000" loading="lazy">
+            <span class="badge">Coming Soon</span>
+          </div>
+          <h3>Signature Keychain</h3>
+          <span class="meta">$10.00</span>
+          <span class="more">View details</span>
+        </a>
+        <a class="product reveal" href="https://selfandfish.com/products/self-fish-accessories">
+          <div class="tile">
+            <img src="assets/tote.jpg" alt="SELF + FISH Tote, natural canvas bag with the SELF + FISH emblem" width="1000" height="1200" loading="lazy">
+            <span class="badge">Coming Soon</span>
+          </div>
+          <h3>SELF + FISH Tote</h3>
+          <span class="meta">$15.00</span>
+          <span class="more">View details</span>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section class="cta-band section" aria-labelledby="cta-title">
+    <div class="wrap">
+      <span class="eyebrow">A Gentle Return to Me</span>
+      <h2 id="cta-title">Begin Your Journey Back to You</h2>
+      <p>The SELF + FISH Journal is a guided space to heal, reflect, grow, and make room for you.</p>
+      <div class="actions">
+        <a class="btn btn-gold" data-link="purchase" href="https://selfandfish.com/products/self-fish-journal">Get Your Journal Now</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="contact section" id="contact" aria-labelledby="contact-title">
+    <div class="wrap center">
+      <span class="eyebrow kicker">Contact</span>
+      <h2 id="contact-title">Let's <em>Connect</em></h2>
+      <hr class="rule">
+      <p>Questions about the journal, orders, or speaking with Santesha? Send a message and the SELF + FISH team will be in touch.</p>
+      <a class="btn btn-ghost" data-link="contact" href="https://selfandfish.com/pages/contact">Send a Message</a>
+    </div>
+  </section>
+
+</main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <img src="assets/logo-web.png" alt="SELF + FISH" width="900" height="307" loading="lazy">
+    <p class="tag">Woman to Woman. Human to Human.</p>
+    <nav aria-label="Footer">
+      <a href="#founder">Meet Santesha</a>
+      <a href="#journal">The Journal</a>
+      <a data-link="purchase" href="https://selfandfish.com/products/self-fish-journal">Shop</a>
+      <a data-link="contact" href="https://selfandfish.com/pages/contact">Contact</a>
+      <a href="https://selfandfish.com/policies/privacy-policy">Privacy Policy</a>
+    </nav>
+    <small>&copy; <span id="yr">2026</span> SELF + FISH. All rights reserved.</small>
+  </div>
+</footer>
+
+<script>
+  // Mobile menu
+  (function () {
+    var header = document.querySelector('.site-header');
+    var btn = document.querySelector('.menu-toggle');
+    btn.addEventListener('click', function () {
+      var open = header.classList.toggle('menu-open');
+      btn.setAttribute('aria-expanded', open);
+      btn.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    });
+    document.querySelectorAll('.nav a').forEach(function (a) {
+      a.addEventListener('click', function () {
+        header.classList.remove('menu-open');
+        btn.setAttribute('aria-expanded', 'false');
+      });
+    });
+  })();
+
+  // Hero video: pause/play control; respect reduced-motion
+  (function () {
+    var v = document.getElementById('heroVideo');
+    var t = document.querySelector('.video-toggle');
+    var pauseI = t.querySelectorAll('.i-pause'), playI = t.querySelector('.i-play');
+    function sync() {
+      var paused = v.paused;
+      pauseI.forEach(function (el) { el.style.display = paused ? 'none' : ''; });
+      playI.style.display = paused ? '' : 'none';
+      t.setAttribute('aria-label', paused ? 'Play background video' : 'Pause background video');
+    }
+    t.addEventListener('click', function () { v.paused ? v.play() : v.pause(); });
+    v.addEventListener('play', sync); v.addEventListener('pause', sync);
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) { v.removeAttribute('autoplay'); v.pause(); }
+    sync();
+  })();
+
+  // Reveal on scroll
+  (function () {
+    var els = document.querySelectorAll('.reveal');
+    if (!('IntersectionObserver' in window)) { els.forEach(function (e) { e.classList.add('in'); }); return; }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { threshold: 0.15 });
+    els.forEach(function (e) { io.observe(e); });
+  })();
+
+  document.getElementById('yr').textContent = new Date().getFullYear();
+</script>
+</body>
+</html>
