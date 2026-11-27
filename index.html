@@ -760,25 +760,31 @@
     els.forEach(function (e) { io.observe(e); });
   })();
 
-  // Founder story narration: browser text-to-speech with word-by-word read-along
+  // Founder story narration with word-by-word read-along.
+  // 1) Plays recorded audio (assets/audio/story-female.mp3 / story-male.mp3, or .m4a) when those files exist.
+  // 2) Otherwise uses the most natural speech voice on the visitor's device.
   (function () {
-    var synth = window.speechSynthesis;
     var story = document.getElementById('story');
     var wrap = document.getElementById('narrate');
-    if (!synth || !('SpeechSynthesisUtterance' in window) || !story) return;
-    wrap.hidden = false;
+    if (!story) return;
+    var synth = window.speechSynthesis;
+    var hasTTS = !!synth && ('SpeechSynthesisUtterance' in window);
 
     var btn = document.getElementById('listenBtn');
     var stopBtn = document.getElementById('stopBtn');
     var label = btn.querySelector('.listen-label');
-    var sentences = [];
+    var note = wrap.querySelector('.narrate-note');
+    var switchEl = wrap.querySelector('.voice-switch');
+    var opts = wrap.querySelectorAll('.voice-opt');
 
-    // Wrap each sentence and word in spans so they can light up as they are spoken
-    story.querySelectorAll('p').forEach(function (p) {
+    // ---- Wrap each sentence and word in spans so they can light up as they are spoken
+    var sentences = [], allWords = [], totalChars = 0;
+    var paras = story.querySelectorAll('p');
+    paras.forEach(function (p, pi) {
       var text = p.textContent.trim();
-      var parts = text.match(/[^.!?]+[.!?]+["\u201d\u2019]?\s*|[^.!?]+$/g) || [text];
+      var parts = text.match(/[^.!?]+[.!?]+["”’]?\s*|[^.!?]+$/g) || [text];
       p.textContent = '';
-      parts.forEach(function (part) {
+      parts.forEach(function (part, si) {
         var sText = part.trim();
         if (!sText) return;
         var sEl = document.createElement('span');
@@ -790,60 +796,110 @@
           wEl.textContent = m[0];
           if (words.length) sEl.appendChild(document.createTextNode(' '));
           sEl.appendChild(wEl);
-          words.push({ el: wEl, start: m.index });
+          var w = { el: wEl, start: m.index, g: totalChars + m.index, s: sentences.length, i: allWords.length };
+          words.push(w); allWords.push(w);
         }
         p.appendChild(sEl);
         p.appendChild(document.createTextNode(' '));
-        sentences.push({ el: sEl, text: sText, words: words });
+        sentences.push({ el: sEl, text: sText, words: words, paraEnd: si === parts.length - 1 && pi < paras.length - 1 });
+        totalChars += sText.length + 1;
       });
     });
 
-    // Female / Male narrator: pick the warmest matching English voice on this device
-    var PREFER = {
-      female: ['Samantha', 'Ava', 'Allison', 'Susan', 'Zoe', 'Google US English', 'Google UK English Female', 'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Zira', 'Karen', 'Moira', 'Tessa', 'Serena'],
-      male: ['Daniel', 'Alex', 'Aaron', 'Evan', 'Nathan', 'Tom', 'Arthur', 'Oliver', 'Fred', 'Google UK English Male', 'Microsoft Guy', 'Microsoft Davis', 'Microsoft Christopher', 'Microsoft David', 'Microsoft Mark', 'Microsoft Ryan', 'Rishi', 'Lee']
-    };
-    var gender = 'female', voices = { female: null, male: null };
-    function pickVoices() {
-      var vs = synth.getVoices().filter(function (v) { return /^en(-|_|$)/i.test(v.lang); });
-      if (!vs.length) return;
-      ['female', 'male'].forEach(function (g) {
-        var found = null, list = PREFER[g];
-        for (var i = 0; i < list.length && !found; i++) {
-          found = vs.filter(function (v) { return v.name.indexOf(list[i]) === 0; })[0] || null;
-        }
-        if (!found) found = vs.filter(function (v) { return new RegExp('\\b' + g + '\\b', 'i').test(v.name); })[0] || null;
-        voices[g] = found;
-      });
-    }
-    pickVoices();
-    if (synth.onvoiceschanged !== undefined) synth.addEventListener('voiceschanged', pickVoices);
-
-    // Voice switch: changing voice mid-story picks up again from the current sentence
-    document.querySelectorAll('.voice-opt').forEach(function (opt) {
-      opt.addEventListener('click', function () {
-        if (opt.dataset.voice === gender) return;
-        gender = opt.dataset.voice;
-        document.querySelectorAll('.voice-opt').forEach(function (o) {
-          var on = o === opt;
-          o.classList.toggle('on', on);
-          o.setAttribute('aria-checked', on ? 'true' : 'false');
-        });
-        document.querySelector('.voice-switch').dataset.active = gender;
-        if (state !== 'idle') {
-          run++; synth.cancel();
-          setState('playing');
-          speak(idx, run);
-        }
-      });
-    });
-
-    var idx = 0, state = 'idle', run = 0;
-
+    // ---- Highlighting
     function clearMarks() {
-      story.querySelectorAll('.w').forEach(function (w) { w.classList.remove('spoken', 'current'); });
-      story.querySelectorAll('.s').forEach(function (s) { s.classList.remove('active'); });
+      allWords.forEach(function (w) { w.el.classList.remove('spoken', 'current'); });
+      sentences.forEach(function (x) { x.el.classList.remove('active'); });
     }
+    var lastWord = -1;
+    function markWord(i, byWord) {
+      if (i === lastWord) return;
+      lastWord = i;
+      if (byWord !== false) story.classList.add('by-word');
+      allWords.forEach(function (w) {
+        w.el.classList.toggle('spoken', w.i <= i);
+        w.el.classList.toggle('current', w.i === i && byWord !== false);
+      });
+      var si = i >= 0 ? allWords[i].s : -1;
+      sentences.forEach(function (x, k) { x.el.classList.toggle('active', k === si); });
+    }
+
+    // ---- Recorded narration (optional audio files)
+    var recorded = { female: null, male: null };
+    ['female', 'male'].forEach(function (g) {
+      var au = new Audio();
+      au.preload = 'metadata';
+      au.addEventListener('loadedmetadata', function () {
+        recorded[g] = { audio: au, times: null };
+        // Optional exact word timings: assets/audio/story-<voice>.json -> { "words": [start seconds per word] }
+        if (window.fetch) fetch('assets/audio/story-' + g + '.json').then(function (r) { return r.ok ? r.json() : null; })
+          .then(function (j) { if (j && j.words && j.words.length === allWords.length) recorded[g].times = j.words; })
+          .catch(function () {});
+        refreshAvailability();
+      });
+      var exts = ['mp3', 'm4a'], e = 0;
+      au.addEventListener('error', function () {
+        if (++e < exts.length) { au.src = 'assets/audio/story-' + g + '.' + exts[e]; return; }
+        recorded[g] = null; refreshAvailability();
+      });
+      au.src = 'assets/audio/story-' + g + '.' + exts[0];
+    });
+
+    // ---- Device voices, ranked for how natural they sound
+    var NOVELTY = /^(Albert|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Wobble|Eddy|Flo|Fred|Good News|Grandma|Grandpa|Jester|Junior|Kathy|Organ|Superstar|Ralph|Reed|Rocko|Sandy|Shelley|Trinoids|Whisper|Zarvox)\b/i;
+    var NAMES = {
+      female: ['Microsoft Ava', 'Microsoft Emma', 'Microsoft Jenny', 'Microsoft Aria', 'Microsoft Michelle', 'Microsoft Sonia', 'Microsoft Libby', 'Microsoft Natasha', 'Microsoft Clara',
+               'Ava', 'Zoe', 'Allison', 'Serena', 'Kate', 'Fiona', 'Susan', 'Samantha', 'Karen', 'Moira', 'Tessa',
+               'Google US English', 'Google UK English Female', 'Microsoft Zira'],
+      male:   ['Microsoft Andrew', 'Microsoft Brian', 'Microsoft Guy', 'Microsoft Christopher', 'Microsoft Eric', 'Microsoft Roger', 'Microsoft Steffan', 'Microsoft Ryan', 'Microsoft Thomas', 'Microsoft William',
+               'Evan', 'Nathan', 'Tom', 'Aaron', 'Alex', 'Oliver', 'Arthur', 'Gordon', 'Daniel', 'Lee', 'Rishi',
+               'Google UK English Male', 'Microsoft Davis', 'Microsoft David', 'Microsoft Mark']
+    };
+    function score(v, g) {
+      if (NOVELTY.test(v.name)) return -1;
+      var list = NAMES[g], idx = -1;
+      for (var i = 0; i < list.length; i++) { if (v.name.indexOf(list[i]) === 0) { idx = i; break; } }
+      if (idx < 0 && !new RegExp('\\b' + g + '\\b', 'i').test(v.name)) return -1;
+      var sc = idx < 0 ? 5 : 60 - idx;
+      if (/natural|neural/i.test(v.name)) sc += 120;
+      else if (/premium/i.test(v.name)) sc += 100;
+      else if (/enhanced/i.test(v.name)) sc += 80;
+      else if (/^Google/i.test(v.name)) sc += 30;
+      if (/en[-_]US/i.test(v.lang)) sc += 3;
+      return sc;
+    }
+    var deviceVoices = { female: null, male: null };
+    function pickVoices() {
+      if (!hasTTS) return;
+      var vs = synth.getVoices().filter(function (v) { return /^en(-|_|$)/i.test(v.lang); });
+      ['female', 'male'].forEach(function (g) {
+        var best = null, bestSc = -1;
+        vs.forEach(function (v) { var sc = score(v, g); if (sc > bestSc) { best = v; bestSc = sc; } });
+        deviceVoices[g] = bestSc >= 0 ? best : null;
+      });
+      refreshAvailability();
+    }
+
+    var gender = 'female';
+    function available(g) { return !!recorded[g] || !!deviceVoices[g]; }
+    function refreshAvailability() {
+      var any = available('female') || available('male');
+      wrap.hidden = !any;
+      opts.forEach(function (o) {
+        var ok = available(o.dataset.voice);
+        o.disabled = !ok;
+        o.title = ok ? '' : 'This voice is not available on this device';
+      });
+      if (!available(gender) && available(gender === 'female' ? 'male' : 'female')) selectVoice(gender === 'female' ? 'male' : 'female', true);
+      note.textContent = recorded[gender] ? 'Narrated recording' : "Read aloud by your device's voice";
+    }
+    if (hasTTS) {
+      pickVoices();
+      if (synth.onvoiceschanged !== undefined) synth.addEventListener('voiceschanged', pickVoices);
+    }
+
+    // ---- Playback state
+    var state = 'idle', run = 0, mode = null, raf = 0, ttsSentence = 0, pauseTimer = 0;
     function setState(next) {
       state = next;
       var playing = next === 'playing', paused = next === 'paused';
@@ -853,40 +909,66 @@
       label.textContent = playing ? 'Pause' : paused ? 'Resume' : "Listen to Santesha's Story";
       stopBtn.hidden = next === 'idle';
       story.classList.toggle('narrating', next !== 'idle');
-      if (next === 'idle') { story.classList.remove('by-word'); clearMarks(); }
+      if (next === 'idle') { story.classList.remove('by-word'); clearMarks(); lastWord = -1; }
+    }
+    function halt() {
+      run++;
+      cancelAnimationFrame(raf); clearTimeout(pauseTimer);
+      if (hasTTS) synth.cancel();
+      ['female', 'male'].forEach(function (g) { if (recorded[g]) recorded[g].audio.pause(); });
     }
 
-    function speak(i, token) {
+    // Recorded audio: follow playback time to highlight words
+    function wordAtTime(rec, t) {
+      if (rec.times) {
+        var i = -1;
+        for (var k = 0; k < rec.times.length; k++) { if (rec.times[k] <= t) i = k; else break; }
+        return i;
+      }
+      var d = rec.audio.duration || 1;
+      var c = (t / d) * totalChars, idx = -1;
+      for (var j = 0; j < allWords.length; j++) { if (allWords[j].g <= c) idx = j; else break; }
+      return idx;
+    }
+    function playAudio(fromWord) {
+      var rec = recorded[gender], au = rec.audio, token = run;
+      mode = 'audio';
+      var t = 0;
+      if (fromWord > 0) t = rec.times ? rec.times[fromWord] : (allWords[fromWord].g / totalChars) * (au.duration || 0);
+      try { au.currentTime = t; } catch (e) {}
+      au.onended = function () { if (token === run) setState('idle'); };
+      var p = au.play();
+      if (p && p.catch) p.catch(function () { if (token === run) setState('idle'); });
+      (function tick() {
+        if (token !== run) return;
+        markWord(wordAtTime(rec, au.currentTime));
+        raf = requestAnimationFrame(tick);
+      })();
+    }
+
+    // Device voice: speak sentence by sentence with natural pauses between them
+    function speakFrom(i, token) {
       if (token !== run) return;
       if (i >= sentences.length) { setState('idle'); return; }
-      idx = i;
-      var s = sentences[i];
-      sentences.forEach(function (x, k) {
-        x.el.classList.toggle('active', k === i);
-        if (k < i) x.words.forEach(function (w) { w.el.classList.add('spoken'); w.el.classList.remove('current'); });
-      });
+      mode = 'tts';
+      ttsSentence = i;
+      var s = sentences[i], voice = deviceVoices[gender];
+      if (s.words.length) markWord(s.words[0].i - 1, false);
+      sentences.forEach(function (x, k) { x.el.classList.toggle('active', k === i); });
       var u = new SpeechSynthesisUtterance(s.text);
-      var voice = voices[gender];
       if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = 'en-US'; }
-      u.rate = 0.9;
-      // If the device has no male voice, deepen its default voice a little instead
-      u.pitch = (gender === 'male' && !voices.male) ? 0.7 : 1;
+      u.rate = voice && /natural|neural|premium|enhanced|^Google/i.test(voice.name) ? 0.96 : 0.92;
+      u.pitch = 1;
       u.onboundary = function (e) {
-        if (token !== run || e.name && e.name !== 'word') return;
-        story.classList.add('by-word');
-        s.words.forEach(function (w) {
-          var on = w.start <= e.charIndex;
-          w.el.classList.toggle('spoken', on);
-          w.el.classList.remove('current');
-        });
-        var cur = s.words.filter(function (w) { return w.start <= e.charIndex; }).pop();
-        if (cur) cur.el.classList.add('current');
+        if (token !== run || (e.name && e.name !== 'word')) return;
+        var cur = null;
+        s.words.forEach(function (w) { if (w.start <= e.charIndex) cur = w; });
+        if (cur) markWord(cur.i);
       };
       u.onend = function () {
         if (token !== run) return;
-        s.words.forEach(function (w) { w.el.classList.add('spoken'); w.el.classList.remove('current'); });
-        s.el.classList.remove('active');
-        speak(i + 1, token);
+        if (s.words.length) markWord(s.words[s.words.length - 1].i, false);
+        pauseTimer = setTimeout(function () { speakFrom(i + 1, token); }, s.paraEnd ? 650 : 260);
       };
       u.onerror = function (e) {
         if (token !== run || e.error === 'interrupted' || e.error === 'canceled') return;
@@ -895,22 +977,49 @@
       synth.speak(u);
     }
 
-    function start() {
-      run++;
-      synth.cancel();
-      clearMarks();
+    function begin(fromWord) {
+      halt();
+      story.classList.remove('by-word'); lastWord = -1;
       setState('playing');
-      speak(0, run);
+      if (recorded[gender]) playAudio(fromWord);
+      else if (deviceVoices[gender] || hasTTS) speakFrom(fromWord > 0 ? allWords[fromWord].s : 0, run);
+      else setState('idle');
     }
-    function stop() { run++; synth.cancel(); setState('idle'); }
+    function stop() { halt(); setState('idle'); }
+
+    // ---- Voice switch: changing voice mid-story carries on from the current word / sentence
+    function selectVoice(g, silent) {
+      gender = g;
+      opts.forEach(function (o) {
+        var on = o.dataset.voice === g;
+        o.classList.toggle('on', on);
+        o.setAttribute('aria-checked', on ? 'true' : 'false');
+      });
+      switchEl.dataset.active = g;
+      note.textContent = recorded[g] ? 'Narrated recording' : "Read aloud by your device's voice";
+      if (!silent && state !== 'idle') {
+        var from = mode === 'tts' && sentences[ttsSentence].words.length ? sentences[ttsSentence].words[0].i : Math.max(lastWord, 0);
+        begin(from);
+      }
+    }
+    opts.forEach(function (o) {
+      o.addEventListener('click', function () { if (o.dataset.voice !== gender && !o.disabled) selectVoice(o.dataset.voice); });
+    });
 
     btn.addEventListener('click', function () {
-      if (state === 'idle') start();
-      else if (state === 'playing') { synth.pause(); setState('paused'); }
-      else { synth.resume(); setState('playing'); }
+      if (state === 'idle') { begin(0); return; }
+      if (state === 'playing') {
+        if (mode === 'audio') { recorded[gender].audio.pause(); cancelAnimationFrame(raf); }
+        else { synth.pause(); }
+        setState('paused');
+      } else {
+        setState('playing');
+        if (mode === 'audio') { var keep = run; recorded[gender].audio.play(); (function tick() { if (keep !== run) return; markWord(wordAtTime(recorded[gender], recorded[gender].audio.currentTime)); raf = requestAnimationFrame(tick); })(); }
+        else { synth.resume(); }
+      }
     });
     stopBtn.addEventListener('click', stop);
-    window.addEventListener('pagehide', function () { synth.cancel(); });
+    window.addEventListener('pagehide', function () { halt(); });
   })();
 
   document.getElementById('yr').textContent = new Date().getFullYear();

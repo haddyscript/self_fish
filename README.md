@@ -48,6 +48,25 @@ The page plays `assets/hero-beach.mp4` (or `assets/hero-beach.webm`) first. Add 
 
 Keep the clip short, loop-friendly, and compressed (ideally under 5 MB at 1080p). The video is muted, autoplays, and pauses for visitors who have reduced motion turned on.
 
+## Story narration (Female / Male)
+
+The "Listen to Santesha's Story" button reads the founder story aloud and highlights each word as it is spoken.
+
+**Recorded voices (recommended, sounds human):** add the recordings to `assets/audio/`:
+
+```
+assets/audio/story-female.mp3   (or .m4a)
+assets/audio/story-male.mp3     (or .m4a)
+```
+
+When a file is present, the page plays it for that voice for every visitor. When it is missing, that voice falls back to the device's own speech voice. Each recording must read exactly this text:
+
+> I created SELF + FISH from a personal journey of healing, self-discovery, and growth. This journal is a collection of the lessons I've learned, the challenges I've faced, and the tools that helped me keep going. My heart is to encourage you, remind you that you're not alone, and give you a safe space to heal, reflect, and grow into the next version of yourself.
+
+Word highlighting follows the recording automatically. For exact timing, add `assets/audio/story-female.json` (and `story-male.json`) containing `{ "words": [ ... ] }`, with the start time in seconds of each of the 65 words.
+
+**Device voice fallback:** the page picks the most natural voice the visitor's device offers (Microsoft "Natural" voices in Edge, Apple Premium/Enhanced voices, then standard voices) and skips novelty voices. If a device has no voice for one option, that option is disabled.
+
 ## Links
 
 | Button | Destination |
