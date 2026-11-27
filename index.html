@@ -273,6 +273,57 @@
   /* Header logo */
   .brand img { transition: transform .45s var(--ease), filter .45s var(--ease); }
 
+  /* Founder story narration (text-to-speech read-along) */
+  .story .w { transition: color .25s ease, background-size .3s ease; border-radius: 2px; }
+  .story.narrating .w { color: rgba(91, 90, 80, .5); }
+  .story.narrating .w.spoken { color: var(--ink-soft); }
+  .story.narrating .s.active .w { color: var(--ink); }
+  .story.narrating.by-word .s.active .w { color: rgba(91, 90, 80, .5); }
+  .story.narrating.by-word .s.active .w.spoken { color: var(--ink); }
+  .story.narrating .w.current {
+    color: var(--olive-900);
+    background-image: linear-gradient(transparent 62%, rgba(226, 203, 147, .55) 62%);
+  }
+  .narrate { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 14px; margin-top: 34px; }
+  .narrate[hidden] { display: none; }
+  .listen-btn {
+    display: inline-flex; align-items: center; gap: 14px; min-height: 52px;
+    padding: 8px 26px 8px 8px; border-radius: 999px; cursor: pointer;
+    background: var(--white); color: var(--olive-900);
+    border: 1px solid rgba(169, 130, 58, .55);
+    font-family: var(--sans); font-size: 12.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
+    transition: background .35s var(--ease), border-color .35s var(--ease), box-shadow .35s var(--ease), transform .35s var(--ease);
+  }
+  .listen-btn:focus-visible, .stop-btn:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 3px; }
+  .listen-ico {
+    width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; flex: none;
+    background: var(--olive-700); color: var(--gold-300);
+    transition: background .35s var(--ease), transform .35s var(--ease);
+  }
+  .listen-ico svg { width: 15px; height: 15px; }
+  .listen-btn .i-pause, .listen-btn.playing .i-play { display: none; }
+  .listen-btn.playing .i-pause { display: block; }
+  .eq { display: none; align-items: flex-end; gap: 3px; height: 16px; }
+  .listen-btn.playing .eq { display: inline-flex; }
+  .eq i { width: 3px; height: 100%; border-radius: 2px; background: var(--gold-500); transform-origin: bottom; animation: eq 1s ease-in-out infinite; }
+  .eq i:nth-child(2) { animation-delay: -.35s; } .eq i:nth-child(3) { animation-delay: -.7s; } .eq i:nth-child(4) { animation-delay: -.15s; }
+  .listen-btn.paused .eq i { animation-play-state: paused; }
+  @keyframes eq { 0%, 100% { transform: scaleY(.3); } 50% { transform: scaleY(1); } }
+  .stop-btn {
+    width: 44px; height: 44px; border-radius: 50%; cursor: pointer; display: grid; place-items: center;
+    border: 1px solid rgba(169, 130, 58, .45); background: transparent; color: var(--olive-700);
+    transition: background .3s var(--ease), color .3s var(--ease);
+  }
+  .stop-btn[hidden] { display: none; }
+  .stop-btn svg { width: 14px; height: 14px; }
+  .narrate-note { flex-basis: 100%; margin: 0; font-size: 12px; letter-spacing: .06em; color: rgba(91, 90, 80, .7); }
+  @media (hover: hover) and (pointer: fine) {
+    .listen-btn:hover { border-color: var(--gold-500); transform: translateY(-2px); box-shadow: 0 14px 30px -14px rgba(43, 52, 21, .45); }
+    .listen-btn:hover .listen-ico { background: var(--olive-900); transform: scale(1.06); }
+    .stop-btn:hover { background: var(--olive-700); color: var(--ivory); }
+  }
+  @media (prefers-reduced-motion: reduce) { .eq i { animation: none; transform: scaleY(.6); } }
+
   /* Founder portrait: cut-out set inside an arched frame (hides the photo's straight cut edges) */
   .founder .arch { position: relative; padding: 14px 14px 0; }
   .founder .arch::before {
@@ -481,8 +532,24 @@
         <h2 id="founder-title">Santesha <em>Johnson</em></h2>
         <p class="role">Founder, SELF + FISH</p>
         <p class="tagline">Woman to Woman. Human to Human.</p>
-        <p class="body">I created SELF + FISH from a personal journey of healing, self-discovery, and growth. This journal is a collection of the lessons I've learned, the challenges I've faced, and the tools that helped me keep going.</p>
-        <p class="body">My heart is to encourage you, remind you that you're not alone, and give you a safe space to heal, reflect, and grow into the next version of yourself.</p>
+        <div class="story" id="story">
+          <p class="body">I created SELF + FISH from a personal journey of healing, self-discovery, and growth. This journal is a collection of the lessons I've learned, the challenges I've faced, and the tools that helped me keep going.</p>
+          <p class="body">My heart is to encourage you, remind you that you're not alone, and give you a safe space to heal, reflect, and grow into the next version of yourself.</p>
+        </div>
+        <div class="narrate" id="narrate" hidden>
+          <button type="button" class="listen-btn" id="listenBtn" aria-controls="story" aria-pressed="false">
+            <span class="listen-ico" aria-hidden="true">
+              <svg class="i-play" viewBox="0 0 16 16" fill="currentColor"><path d="M5 3.2v9.6L13 8z"/></svg>
+              <svg class="i-pause" viewBox="0 0 16 16" fill="currentColor"><rect x="4" y="3" width="2.8" height="10" rx=".8"/><rect x="9.2" y="3" width="2.8" height="10" rx=".8"/></svg>
+            </span>
+            <span class="listen-label">Listen to Santesha's Story</span>
+            <span class="eq" aria-hidden="true"><i></i><i></i><i></i><i></i></span>
+          </button>
+          <button type="button" class="stop-btn" id="stopBtn" aria-label="Stop narration" hidden>
+            <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="8" height="8" rx="1.2"/></svg>
+          </button>
+          <p class="narrate-note">Read aloud by your device's voice</p>
+        </div>
       </div>
     </div>
   </section>
@@ -667,6 +734,129 @@
       entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
     }, { threshold: 0.15 });
     els.forEach(function (e) { io.observe(e); });
+  })();
+
+  // Founder story narration: browser text-to-speech with word-by-word read-along
+  (function () {
+    var synth = window.speechSynthesis;
+    var story = document.getElementById('story');
+    var wrap = document.getElementById('narrate');
+    if (!synth || !('SpeechSynthesisUtterance' in window) || !story) return;
+    wrap.hidden = false;
+
+    var btn = document.getElementById('listenBtn');
+    var stopBtn = document.getElementById('stopBtn');
+    var label = btn.querySelector('.listen-label');
+    var sentences = [];
+
+    // Wrap each sentence and word in spans so they can light up as they are spoken
+    story.querySelectorAll('p').forEach(function (p) {
+      var text = p.textContent.trim();
+      var parts = text.match(/[^.!?]+[.!?]+["\u201d\u2019]?\s*|[^.!?]+$/g) || [text];
+      p.textContent = '';
+      parts.forEach(function (part) {
+        var sText = part.trim();
+        if (!sText) return;
+        var sEl = document.createElement('span');
+        sEl.className = 's';
+        var words = [], re = /\S+/g, m;
+        while ((m = re.exec(sText))) {
+          var wEl = document.createElement('span');
+          wEl.className = 'w';
+          wEl.textContent = m[0];
+          if (words.length) sEl.appendChild(document.createTextNode(' '));
+          sEl.appendChild(wEl);
+          words.push({ el: wEl, start: m.index });
+        }
+        p.appendChild(sEl);
+        p.appendChild(document.createTextNode(' '));
+        sentences.push({ el: sEl, text: sText, words: words });
+      });
+    });
+
+    // Pick a warm English voice when one is available
+    var voice = null;
+    function pickVoice() {
+      var vs = synth.getVoices().filter(function (v) { return /^en(-|_|$)/i.test(v.lang); });
+      var prefer = ['Samantha', 'Ava', 'Allison', 'Susan', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Zira', 'Karen', 'Moira', 'Tessa', 'Serena'];
+      for (var i = 0; i < prefer.length && !voice; i++) {
+        voice = vs.filter(function (v) { return v.name.indexOf(prefer[i]) === 0; })[0] || null;
+      }
+      if (!voice) voice = vs.filter(function (v) { return /female/i.test(v.name); })[0] || vs[0] || null;
+    }
+    pickVoice();
+    if (synth.onvoiceschanged !== undefined) synth.addEventListener('voiceschanged', function () { if (!voice) pickVoice(); });
+
+    var idx = 0, state = 'idle', run = 0;
+
+    function clearMarks() {
+      story.querySelectorAll('.w').forEach(function (w) { w.classList.remove('spoken', 'current'); });
+      story.querySelectorAll('.s').forEach(function (s) { s.classList.remove('active'); });
+    }
+    function setState(next) {
+      state = next;
+      var playing = next === 'playing', paused = next === 'paused';
+      btn.classList.toggle('playing', playing || paused);
+      btn.classList.toggle('paused', paused);
+      btn.setAttribute('aria-pressed', playing ? 'true' : 'false');
+      label.textContent = playing ? 'Pause' : paused ? 'Resume' : "Listen to Santesha's Story";
+      stopBtn.hidden = next === 'idle';
+      story.classList.toggle('narrating', next !== 'idle');
+      if (next === 'idle') { story.classList.remove('by-word'); clearMarks(); }
+    }
+
+    function speak(i, token) {
+      if (token !== run) return;
+      if (i >= sentences.length) { setState('idle'); return; }
+      idx = i;
+      var s = sentences[i];
+      sentences.forEach(function (x, k) {
+        x.el.classList.toggle('active', k === i);
+        if (k < i) x.words.forEach(function (w) { w.el.classList.add('spoken'); w.el.classList.remove('current'); });
+      });
+      var u = new SpeechSynthesisUtterance(s.text);
+      if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = 'en-US'; }
+      u.rate = 0.9; u.pitch = 1;
+      u.onboundary = function (e) {
+        if (token !== run || e.name && e.name !== 'word') return;
+        story.classList.add('by-word');
+        s.words.forEach(function (w) {
+          var on = w.start <= e.charIndex;
+          w.el.classList.toggle('spoken', on);
+          w.el.classList.remove('current');
+        });
+        var cur = s.words.filter(function (w) { return w.start <= e.charIndex; }).pop();
+        if (cur) cur.el.classList.add('current');
+      };
+      u.onend = function () {
+        if (token !== run) return;
+        s.words.forEach(function (w) { w.el.classList.add('spoken'); w.el.classList.remove('current'); });
+        s.el.classList.remove('active');
+        speak(i + 1, token);
+      };
+      u.onerror = function (e) {
+        if (token !== run || e.error === 'interrupted' || e.error === 'canceled') return;
+        setState('idle');
+      };
+      synth.speak(u);
+    }
+
+    function start() {
+      run++;
+      synth.cancel();
+      clearMarks();
+      setState('playing');
+      speak(0, run);
+    }
+    function stop() { run++; synth.cancel(); setState('idle'); }
+
+    btn.addEventListener('click', function () {
+      if (state === 'idle') start();
+      else if (state === 'playing') { synth.pause(); setState('paused'); }
+      else { synth.resume(); setState('playing'); }
+    });
+    stopBtn.addEventListener('click', stop);
+    window.addEventListener('pagehide', function () { synth.cancel(); });
   })();
 
   document.getElementById('yr').textContent = new Date().getFullYear();

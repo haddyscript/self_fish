@@ -9,7 +9,7 @@ This is a static, single-page website (HTML and CSS, with a little JavaScript). 
 ## Page sections
 
 1. **Hero:** full-screen moving beach video with the headline "A Gentle Return to You"
-2. **Meet the Founder:** Santesha's original photo and story
+2. **Meet the Founder:** Santesha's photo and story, with a "Listen to Santesha's Story" button that reads the story aloud (browser text-to-speech) and highlights each word as it is spoken
 3. **The Wellness Journal:** journal introduction, Heal / Reflect / Grow / You themes, details, price, and order button
 4. **Make Room for You:** journal benefits
 5. **Coming Soon:** Signature Keychain and Tote
