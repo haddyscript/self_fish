@@ -317,6 +317,26 @@
   .stop-btn[hidden] { display: none; }
   .stop-btn svg { width: 14px; height: 14px; }
   .narrate-note { flex-basis: 100%; margin: 0; font-size: 12px; letter-spacing: .06em; color: rgba(91, 90, 80, .7); }
+  .voice-switch {
+    position: relative; display: inline-grid; grid-template-columns: 1fr 1fr;
+    padding: 4px; border-radius: 999px; border: 1px solid rgba(169, 130, 58, .45); background: var(--ivory);
+  }
+  .voice-switch::before {
+    /* sliding olive pill behind the active option */
+    content: ""; position: absolute; top: 4px; bottom: 4px; left: 4px; width: calc(50% - 4px);
+    border-radius: 999px; background: var(--olive-700);
+    transition: transform .4s var(--ease);
+  }
+  .voice-switch[data-active="male"]::before { transform: translateX(100%); }
+  .voice-opt {
+    position: relative; z-index: 1; min-width: 78px; min-height: 36px; padding: 0 16px;
+    border: 0; background: none; cursor: pointer; border-radius: 999px;
+    font-family: var(--sans); font-size: 11.5px; font-weight: 500; letter-spacing: .16em; text-transform: uppercase;
+    color: var(--olive-700); transition: color .35s var(--ease);
+  }
+  .voice-opt.on { color: var(--ivory); }
+  .voice-opt:focus-visible { outline: 2px solid var(--gold-500); outline-offset: 2px; }
+  @media (hover: hover) and (pointer: fine) { .voice-opt:not(.on):hover { color: var(--gold-600); } }
   @media (hover: hover) and (pointer: fine) {
     .listen-btn:hover { border-color: var(--gold-500); transform: translateY(-2px); box-shadow: 0 14px 30px -14px rgba(43, 52, 21, .45); }
     .listen-btn:hover .listen-ico { background: var(--olive-900); transform: scale(1.06); }
@@ -548,6 +568,10 @@
           <button type="button" class="stop-btn" id="stopBtn" aria-label="Stop narration" hidden>
             <svg viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><rect x="4" y="4" width="8" height="8" rx="1.2"/></svg>
           </button>
+          <div class="voice-switch" role="radiogroup" aria-label="Narrator voice" data-active="female">
+            <button type="button" class="voice-opt on" data-voice="female" role="radio" aria-checked="true">Female</button>
+            <button type="button" class="voice-opt" data-voice="male" role="radio" aria-checked="false">Male</button>
+          </div>
           <p class="narrate-note">Read aloud by your device's voice</p>
         </div>
       </div>
@@ -774,18 +798,45 @@
       });
     });
 
-    // Pick a warm English voice when one is available
-    var voice = null;
-    function pickVoice() {
+    // Female / Male narrator: pick the warmest matching English voice on this device
+    var PREFER = {
+      female: ['Samantha', 'Ava', 'Allison', 'Susan', 'Zoe', 'Google US English', 'Google UK English Female', 'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Zira', 'Karen', 'Moira', 'Tessa', 'Serena'],
+      male: ['Daniel', 'Alex', 'Aaron', 'Evan', 'Nathan', 'Tom', 'Arthur', 'Oliver', 'Fred', 'Google UK English Male', 'Microsoft Guy', 'Microsoft Davis', 'Microsoft Christopher', 'Microsoft David', 'Microsoft Mark', 'Microsoft Ryan', 'Rishi', 'Lee']
+    };
+    var gender = 'female', voices = { female: null, male: null };
+    function pickVoices() {
       var vs = synth.getVoices().filter(function (v) { return /^en(-|_|$)/i.test(v.lang); });
-      var prefer = ['Samantha', 'Ava', 'Allison', 'Susan', 'Google US English', 'Microsoft Aria', 'Microsoft Jenny', 'Microsoft Zira', 'Karen', 'Moira', 'Tessa', 'Serena'];
-      for (var i = 0; i < prefer.length && !voice; i++) {
-        voice = vs.filter(function (v) { return v.name.indexOf(prefer[i]) === 0; })[0] || null;
-      }
-      if (!voice) voice = vs.filter(function (v) { return /female/i.test(v.name); })[0] || vs[0] || null;
+      if (!vs.length) return;
+      ['female', 'male'].forEach(function (g) {
+        var found = null, list = PREFER[g];
+        for (var i = 0; i < list.length && !found; i++) {
+          found = vs.filter(function (v) { return v.name.indexOf(list[i]) === 0; })[0] || null;
+        }
+        if (!found) found = vs.filter(function (v) { return new RegExp('\\b' + g + '\\b', 'i').test(v.name); })[0] || null;
+        voices[g] = found;
+      });
     }
-    pickVoice();
-    if (synth.onvoiceschanged !== undefined) synth.addEventListener('voiceschanged', function () { if (!voice) pickVoice(); });
+    pickVoices();
+    if (synth.onvoiceschanged !== undefined) synth.addEventListener('voiceschanged', pickVoices);
+
+    // Voice switch: changing voice mid-story picks up again from the current sentence
+    document.querySelectorAll('.voice-opt').forEach(function (opt) {
+      opt.addEventListener('click', function () {
+        if (opt.dataset.voice === gender) return;
+        gender = opt.dataset.voice;
+        document.querySelectorAll('.voice-opt').forEach(function (o) {
+          var on = o === opt;
+          o.classList.toggle('on', on);
+          o.setAttribute('aria-checked', on ? 'true' : 'false');
+        });
+        document.querySelector('.voice-switch').dataset.active = gender;
+        if (state !== 'idle') {
+          run++; synth.cancel();
+          setState('playing');
+          speak(idx, run);
+        }
+      });
+    });
 
     var idx = 0, state = 'idle', run = 0;
 
@@ -815,8 +866,11 @@
         if (k < i) x.words.forEach(function (w) { w.el.classList.add('spoken'); w.el.classList.remove('current'); });
       });
       var u = new SpeechSynthesisUtterance(s.text);
+      var voice = voices[gender];
       if (voice) { u.voice = voice; u.lang = voice.lang; } else { u.lang = 'en-US'; }
-      u.rate = 0.9; u.pitch = 1;
+      u.rate = 0.9;
+      // If the device has no male voice, deepen its default voice a little instead
+      u.pitch = (gender === 'male' && !voices.male) ? 0.7 : 1;
       u.onboundary = function (e) {
         if (token !== run || e.name && e.name !== 'word') return;
         story.classList.add('by-word');
