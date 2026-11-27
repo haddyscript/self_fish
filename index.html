@@ -163,8 +163,8 @@
   }
   .founder figure { margin: 0; justify-self: center; width: 100%; max-width: 440px; }
   .founder figure img {
-    width: 100%; height: auto; /* natural aspect ratio: no cropping, no alteration */
-    box-shadow: 0 30px 60px -30px rgba(43, 52, 21, .35);
+    width: 100%; height: auto; /* natural aspect ratio; background removed, face untouched */
+    filter: drop-shadow(0 24px 30px rgba(43, 52, 21, .16));
   }
   .founder figcaption {
     margin-top: 18px; font-size: 12px; letter-spacing: .24em; text-transform: uppercase; color: var(--ink-soft); text-align: center;
@@ -277,14 +277,19 @@
   /* Header logo */
   .brand img { transition: transform .45s var(--ease), filter .45s var(--ease); }
 
-  /* Founder photo: offset gold frame slides in */
-  .founder figure .frame { position: relative; }
+  /* Founder cut-out: soft ivory glow behind her, gold line grounding the bottom edge */
+  .founder figure .frame { position: relative; isolation: isolate; }
   .founder figure .frame::before {
-    content: ""; position: absolute; inset: 0; border: 1px solid var(--gold-500);
-    transform: translate(0, 0); opacity: 0; pointer-events: none;
+    content: ""; position: absolute; z-index: -1; left: 6%; right: 6%; top: 8%; bottom: 0;
+    background: radial-gradient(ellipse at 50% 55%, var(--ivory-2) 0%, rgba(244, 239, 227, 0) 70%);
     transition: transform .6s var(--ease), opacity .6s var(--ease);
   }
-  .founder figure img { position: relative; transition: transform .6s var(--ease), box-shadow .6s var(--ease); }
+  .founder figure .frame::after {
+    content: ""; position: absolute; left: 10%; right: 10%; bottom: 0; height: 1px;
+    background: linear-gradient(90deg, transparent, var(--gold-500), transparent);
+    transition: left .6s var(--ease), right .6s var(--ease);
+  }
+  .founder figure img { position: relative; transition: transform .6s var(--ease), filter .6s var(--ease); }
 
   /* Journal cover */
   .journal .cover { transition: transform .6s var(--ease), box-shadow .6s var(--ease), border-color .6s var(--ease); }
@@ -337,8 +342,9 @@
     .nav a.link:hover { color: var(--gold-600); }
     .brand:hover img { transform: scale(1.04); filter: drop-shadow(0 4px 10px rgba(193, 155, 79, .35)); }
 
-    .founder figure:hover .frame::before { transform: translate(16px, 16px); opacity: 1; }
-    .founder figure:hover img { transform: translate(-4px, -4px); box-shadow: 0 40px 70px -30px rgba(43, 52, 21, .45); }
+    .founder figure:hover .frame::before { transform: scale(1.06); }
+    .founder figure:hover .frame::after { left: 0; right: 0; }
+    .founder figure:hover img { transform: translateY(-6px); filter: drop-shadow(0 34px 36px rgba(43, 52, 21, .24)); }
 
     .journal .cover:hover {
       transform: translateY(-8px) rotate(-.6deg);
@@ -459,7 +465,7 @@
     <div class="wrap grid">
       <figure class="reveal">
         <!-- Original founder photo, used as supplied (no retouching, regeneration or cropping of the face) -->
-        <div class="frame"><img src="assets/founder.png" alt="Santesha Johnson, founder of SELF + FISH" width="647" height="1150" loading="lazy"></div>
+        <div class="frame"><img src="assets/founder-cutout.png" alt="Santesha Johnson, founder of SELF + FISH" width="647" height="963" loading="lazy"></div>
         <figcaption>Santesha Johnson</figcaption>
       </figure>
       <div class="reveal">

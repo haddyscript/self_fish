@@ -23,7 +23,8 @@ index.html        The whole page (markup, styles, and scripts)
 assets/
   logo.png        Original SELF + FISH logo (source file)
   logo-web.png    Web-sized copy of the logo used on the page
-  founder.png     Original founder photo (used as supplied, not retouched)
+  founder.png     Original founder photo (unmodified source file)
+  founder-cutout.png  Founder photo with the background removed (used on the page; face not altered)
   founder-alt.png Second original founder photo (not used on the page yet)
   journal-2.png   Journal cover
   keychain.jpg    Signature Keychain product image
