@@ -52,7 +52,23 @@ Keep the clip short, loop-friendly, and compressed (ideally under 5 MB at 1080p)
 
 The "Listen to Santesha's Story" button reads the founder story aloud and highlights each word as it is spoken.
 
-**Recorded voices (recommended, sounds human):** add the recordings to `assets/audio/`:
+**Generate natural voices with ElevenLabs (recommended):**
+
+1. Create an ElevenLabs account. A paid plan (Starter or above) is needed for commercial use on a business website.
+2. Copy your API key from your ElevenLabs profile settings.
+3. From this folder, run:
+
+   ```bash
+   export ELEVENLABS_API_KEY="paste-your-key-here"
+   python3 scripts/generate_narration.py
+   ```
+
+   This creates `assets/audio/story-female.mp3`, `story-male.mp3` and their `.json` word timings. Default voices are Sarah (female) and Brian (male). To try others, run `python3 scripts/generate_narration.py --list` and set `ELEVENLABS_FEMALE_VOICE_ID` / `ELEVENLABS_MALE_VOICE_ID`.
+4. Commit and push the files in `assets/audio/`. Never commit the API key.
+
+If you change the story text in `index.html`, run the script again so the audio matches.
+
+**Or use your own recordings:** add them to `assets/audio/`:
 
 ```
 assets/audio/story-female.mp3   (or .m4a)
