@@ -345,12 +345,23 @@
   @media (prefers-reduced-motion: reduce) { .eq i { animation: none; transform: scaleY(.6); } }
 
   /* Founder portrait: cut-out set inside an arched frame (hides the photo's straight cut edges) */
-  .founder .arch { position: relative; padding: 14px 14px 0; }
+  .founder .arch {
+    /* metallic gold arch frame with a slim white mat and soft golden glow */
+    position: relative; padding: 9px;
+    border: 4px solid transparent; border-radius: 999px 999px 4px 4px;
+    background:
+      linear-gradient(#ffffff, #ffffff) padding-box,
+      linear-gradient(145deg, #f7e9b8 0%, #d4b264 18%, #9c7a30 36%, #f1dc9c 52%, #b8913f 68%, #e8cf88 84%, #8f6d28 100%) border-box;
+    box-shadow:
+      0 0 0 1px rgba(169, 130, 58, .18),
+      0 0 26px 2px rgba(226, 203, 147, .55),
+      0 34px 60px -32px rgba(43, 52, 21, .38);
+    transition: box-shadow .7s var(--ease), transform .7s var(--ease);
+  }
   .founder .arch::before {
-    /* fine gold arch outline, offset from the portrait */
-    content: ""; position: absolute; inset: 0 0 -14px 0; border: 1px solid rgba(169, 130, 58, .55);
-    border-radius: 999px 999px 0 0; pointer-events: none;
-    transition: transform .7s var(--ease), border-color .7s var(--ease);
+    /* thin inner gold hairline around the portrait */
+    content: ""; position: absolute; inset: 6px; z-index: 3; pointer-events: none;
+    border: 1px solid rgba(193, 155, 79, .45); border-radius: 999px 999px 2px 2px;
   }
   .founder figure .frame {
     position: relative; overflow: hidden; isolation: isolate;
@@ -422,7 +433,7 @@
     .nav a.link:hover { color: var(--gold-600); }
     .brand:hover img { transform: scale(1.04); filter: drop-shadow(0 4px 10px rgba(193, 155, 79, .35)); }
 
-    .founder figure:hover .arch::before { transform: translate(8px, -8px); border-color: var(--gold-500); }
+    .founder figure:hover .arch { transform: translateY(-4px); box-shadow: 0 0 0 1px rgba(169, 130, 58, .28), 0 0 38px 6px rgba(226, 203, 147, .7), 0 44px 70px -34px rgba(43, 52, 21, .45); }
     .founder figure:hover .frame img { transform: translateX(-50%) scale(1.03); }
 
     .journal .cover:hover {
